@@ -9,6 +9,7 @@ package frc.robot.util;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 import java.util.ArrayList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.FieldConstants;
@@ -41,17 +43,16 @@ public class BallSimulator {
             Inches.of(0),
             Inches.of(0),
             Inches.of(30),
-            new Rotation3d(
-                0,
-                -Math.toRadians(45), 0 // 45 degree launch angle
-            ));
+            new Rotation3d());
 
-    public static void launch(LinearVelocity velocity, RobotState robotState)
+    public static void launch(LinearVelocity velocity, Angle launchAngle, RobotState robotState)
     {
         objectTrajectory.clear();
 
         // Set initial position
-        currentPose = new Pose3d(robotState.getPose()).plus(shooterOffset);
+        currentPose =
+            new Pose3d(robotState.getPose()).plus(shooterOffset.plus(new Transform3d(0.0, 0.0, 0.0,
+                new Rotation3d(Radians.of(0.0), launchAngle, Radians.of(0.0)))));
 
         // Set initial velocity
         objectVelocity = new Translation3d(velocity.in(MetersPerSecond), currentPose.getRotation());

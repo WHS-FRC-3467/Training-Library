@@ -1,0 +1,207 @@
+{
+  "hubs": [
+    {
+      "x": 173,
+      "y": 114,
+      "width": 1100,
+      "height": 650,
+      "state": {
+        "sidebar": {
+          "width": 379,
+          "expanded": [
+            "/AdvantageKit",
+            "/AdvantageKit/RealOutputs",
+            "/AdvantageKit/RealOutputs/AlignmentDebug",
+            "/AdvantageKit/RealOutputs/AlignmentDebug/LastBranchL",
+            "/AdvantageKit/NetworkInputs/SmartDashboard",
+            "/AdvantageKit/RealOutputs/Vision/Camera0",
+            "/AdvantageKit/RealOutputs/Vision/Camera1",
+            "/AdvantageKit/Vision/Camera1",
+            "/AdvantageKit/RealOutputs/Vision/Summary",
+            "/AdvantageKit/RealOutputs/Vision/Camera1/TagPoses/1",
+            "/AdvantageKit/Vision/Camera0",
+            "/AdvantageKit/Vision/Camera0/TagIds",
+            "/photonvision/front_left",
+            "/AdvantageKit/Vision/Camera1/TagIds",
+            "/AdvantageKit/RealOutputs/SwerveStates/Measured",
+            "/AdvantageKit/RealOutputs/SwerveStates/Measured/0",
+            "/AdvantageKit/RealOutputs/SwerveStates/Measured/0/angle",
+            "/AdvantageKit/RealOutputs/SwerveStates/Setpoints",
+            "/AdvantageKit/RealOutputs/SwerveStates/Setpoints/0",
+            "/AdvantageKit/RealOutputs/SwerveStates/Setpoints/0/angle",
+            "/AdvantageKit/Drive/Module0/TurnAbsolutePosition",
+            "/AdvantageKit/Arm",
+            "/AdvantageKit/Vision/Camera0/PoseObservations",
+            "/AdvantageKit/RealOutputs/SwerveChassisSpeeds/Measured",
+            "/AdvantageKit/RealOutputs/SwerveChassisSpeeds/Setpoints",
+            "/AdvantageKit/RealOutputs/SimMechPoses",
+            "/AdvantageKit/RealOutputs/SimMechPoses/Stage1",
+            "/AdvantageKit/Vision/Camera0/LatestTargetObservation/tx",
+            "/AdvantageKit/RealOutputs/Vision/Camera0/TagPoses/0",
+            "/AdvantageKit/RealOutputs/ALGAE POSE",
+            "/AdvantageKit/Detection Camera #1",
+            "/AdvantageKit/RealOutputs/Detection/True Heading",
+            "/AdvantageKit/RealOutputs/LaserCAN #1Sensor Transform",
+            "/TunableNumbers",
+            "/TunableNumbers/LaserCAN #1",
+            "/AdvantageKit/RealOutputs/Algae Visualizer/translation",
+            "/AdvantageKit/Drive",
+            "/AdvantageKit/RealOutputs/Wheel Slip Current",
+            "/SmartDashboard",
+            "/AdvantageKit/RealOutputs/Rotary",
+            "/AdvantageKit/RealOutputs/Rotary/Pose3d",
+            "/AdvantageKit/Drive/Module0/TurnPosition",
+            "/AdvantageKit/RotaryEncoder",
+            "/SmartDashboard/Rotary Visualizer/Rotary root/RotaryMeasured",
+            "/AdvantageKit/RealOutputs/Pose Array",
+            "/AdvantageKit/RealOutputs/Ball Simulator",
+            "/AdvantageKit/RealOutputs/Detection",
+            "/AdvantageKit/RealOutputs/Odometry/Robot",
+            "/AdvantageKit/RealOutputs/Odometry/Robot/translation",
+            "/AdvantageKit/RealOutputs/Detection/Target Translation",
+            "/AdvantageKit/RealOutputs/Detection/bPose",
+            "/TunableNumbers/Shooter",
+            "/SmartDashboard/Flywheel Visualizer",
+            "/SmartDashboard/Shooter Spinup",
+            "/SmartDashboard/Shoot Ball",
+            "/AdvantageKit/RealOutputs/Flywheel",
+            "/AdvantageKit/Flywheel",
+            "/SmartDashboard/Shooter Stop"
+          ]
+        },
+        "tabs": {
+          "selected": 3,
+          "tabs": [
+            {
+              "type": 0,
+              "title": "",
+              "controller": null,
+              "controllerUUID": "6y10jgypyb5bn6pzmw5zs8gy7seomzbt",
+              "renderer": "#/",
+              "controlsHeight": 0
+            },
+            {
+              "type": 3,
+              "title": "3D Field",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "robot",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Odometry/Robot",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Alpha"
+                    }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Ball Simulator/Current Pose",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Blue Cargo"
+                    }
+                  },
+                  {
+                    "type": "trajectory",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Ball Simulator/Current Trajectory",
+                    "logType": "Translation3d[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "game": "2022 Field",
+                "origin": "auto"
+              },
+              "controllerUUID": "e9lbfvojpfl4jf42468ww3id0rp34jv3",
+              "renderer": {
+                "cameraIndex": -2,
+                "orbitFov": 50,
+                "cameraPosition": [
+                  -2.4883843174931406,
+                  4.11048070793627,
+                  -6.627464337673227
+                ],
+                "cameraTarget": [
+                  -2.6410526143841944,
+                  0.9613358646169265,
+                  1.5179164786904178
+                ]
+              },
+              "controlsHeight": 201
+            },
+            {
+              "type": 10,
+              "title": "Mechanism",
+              "controller": [
+                {
+                  "type": "mechanism",
+                  "logKey": "NT:/SmartDashboard/Flywheel Visualizer",
+                  "logType": "Mechanism2d",
+                  "visible": true,
+                  "options": {}
+                }
+              ],
+              "controllerUUID": "d3u6zp0lkf04raue6jzvs5yez93xlure",
+              "renderer": null,
+              "controlsHeight": 200
+            },
+            {
+              "type": 1,
+              "title": "Line Graph",
+              "controller": {
+                "leftSources": [
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Flywheel/Velocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2",
+                      "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "stepped",
+                    "logKey": "NT:/AdvantageKit/Flywheel/ActiveTrajectoryVelocity",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
+                "rightSources": [],
+                "discreteSources": [],
+                "leftLockedRange": null,
+                "rightLockedRange": null,
+                "leftUnitConversion": {
+                  "type": "angular velocity",
+                  "factor": 1,
+                  "from": "radians/second",
+                  "to": "rotations/minute"
+                },
+                "rightUnitConversion": {
+                  "type": null,
+                  "factor": 1
+                },
+                "leftFilter": 0,
+                "rightFilter": 0
+              },
+              "controllerUUID": "rrjyyljwbawick21kvt5t9vwkz16l5tx",
+              "renderer": null,
+              "controlsHeight": 200
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "satellites": [],
+  "version": "4.1.5"
+}

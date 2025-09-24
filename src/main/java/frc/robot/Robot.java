@@ -20,12 +20,15 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import au.grapplerobotics.CanBridge;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.util.BallSimulator;
+import static edu.wpi.first.units.Units.Meters;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -46,19 +49,6 @@ public class Robot extends LoggedRobot {
 
     public Robot()
     {
-        CanBridge.runTCP(); // Used for configuring LaserCANs via Grapplehook
-
-        // Record metadata
-        Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
-        Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
-        Logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
-        Logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
-        Logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
-        switch (BuildConstants.DIRTY) {
-            case 0 -> Logger.recordMetadata("GitDirty", "All changes committed");
-            case 1 -> Logger.recordMetadata("GitDirty", "Uncomitted changes");
-            default -> Logger.recordMetadata("GitDirty", "Unknown");
-        }
 
         // Set up data receivers & replay source
         switch (Constants.currentMode) {
@@ -66,7 +56,6 @@ public class Robot extends LoggedRobot {
                 // Running on a real robot, log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
-                LoggedPowerDistribution.getInstance(Ports.pdh.id(), ModuleType.kRev);
             }
 
             case SIM -> {
@@ -154,7 +143,9 @@ public class Robot extends LoggedRobot {
     /** This function is called once when the robot is disabled. */
     @Override
     public void disabledInit()
-    {}
+    {
+        robotContainer.drive.setPose(new Pose2d(Meters.of(5), Meters.of(4.25), new Rotation2d()));
+    }
 
     /** This function is called periodically when disabled. */
     @Override

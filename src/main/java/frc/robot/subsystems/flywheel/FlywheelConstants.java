@@ -5,6 +5,8 @@
 package frc.robot.subsystems.flywheel;
 
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Minute;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -29,15 +31,15 @@ public class FlywheelConstants {
     public static String NAME = "Flywheel";
 
     public static final AngularVelocity MAX_VELOCITY =
-        Units.RadiansPerSecond.of(2 * Math.PI);
+        Rotations.per(Minute).of(3000);
     public static final AngularAcceleration MAX_ACCELERATION = MAX_VELOCITY.per(Second);
 
-    private static final double GEARING = (2.0 / 1.0);
+    private static final double GEARING = (1.0 / 1.0);
 
     public static final AngularVelocity TOLERANCE = MAX_VELOCITY.times(0.1);
 
     private static final DCMotor DCMOTOR = DCMotor.getKrakenX60(1);
-    public static final MomentOfInertia MOI = KilogramSquareMeters.of(1.0);
+    public static final MomentOfInertia MOI = KilogramSquareMeters.of(0.01);
 
     // Velocity PID
     private static Slot0Configs SLOT0CONFIG = new Slot0Configs()
