@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.flywheel;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Minute;
 import static edu.wpi.first.units.Units.Rotations;
@@ -13,9 +14,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.lib.io.motor.MotorIOTalonFX;
 import frc.lib.io.motor.MotorIOTalonFXSim;
@@ -35,6 +36,8 @@ public class FlywheelConstants {
     public static final AngularAcceleration MAX_ACCELERATION = MAX_VELOCITY.per(Second);
 
     private static final double GEARING = (1.0 / 1.0);
+
+    public static final Distance DIAMETER = Inches.of(4);
 
     public static final AngularVelocity TOLERANCE = MAX_VELOCITY.times(0.1);
 

@@ -4,9 +4,15 @@
 
 package frc.robot.subsystems.flywheel;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import java.util.function.Supplier;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.io.motor.MotorIO.PIDSlot;
 import frc.lib.mechanisms.flywheel.FlywheelMechanism;
@@ -41,13 +47,29 @@ public class Flywheel extends SubsystemBase {
         return this.runOnce(() -> io.runCoast()).withName("Stop");
     }
 
-    public AngularVelocity getVelocity()
+    public AngularVelocity getAngularVelocity()
     {
         return io.getVelocity();
     }
 
-    public void close()
+    public LinearVelocity getLinearVelocity()
     {
-        io.close();
+        return MetersPerSecond.of(getAngularVelocity().in(RotationsPerSecond) * 2 * Math.PI
+            * (FlywheelConstants.DIAMETER.in(Meters) / 2));
     }
+
+    public Command runVelocityAndWait(Supplier<AngularVelocity> velocity)
+    {
+        return Commands.sequence(
+            shoot(velocity),
+            Commands.waitUntil(() -> withinTolerance(velocity.get(), RotationsPerSecond.of(10.0))));
+    }
+
+    public boolean withinTolerance(AngularVelocity target, AngularVelocity tol)
+    {
+        return MathUtil.isNear(target.in(RotationsPerSecond),
+            io.getVelocity().in(RotationsPerSecond),
+            tol.in(RotationsPerSecond));
+    }
+
 }

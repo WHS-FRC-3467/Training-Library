@@ -149,8 +149,7 @@ public class RobotContainer {
         LoggedTunableNumber launchAngle = new LoggedTunableNumber("Shooter/Launch Angle", -45);
         SmartDashboard.putData("Shoot Ball", Commands
             .runOnce(() -> BallSimulator.launch(
-                MetersPerSecond
-                    .of(flywheel.getVelocity().in(RotationsPerSecond) * 2 * Math.PI * .05),
+                flywheel.getLinearVelocity(),
                 Degrees.of(launchAngle.get()),
                 RobotState.getInstance())));
 
@@ -158,6 +157,7 @@ public class RobotContainer {
             flywheel.shoot(() -> Rotations.per(Minute).of(ballVel.get())));
 
         SmartDashboard.putData("Shooter Stop", flywheel.stop());
+
     }
 
     /**
