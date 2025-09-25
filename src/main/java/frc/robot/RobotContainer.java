@@ -35,7 +35,6 @@ import frc.lib.util.LoggedDashboardChooser;
 import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.AutoCommand;
 import frc.lib.util.CommandXboxControllerExtended;
-import frc.lib.util.GamePieceVisualizer;
 import frc.robot.Constants.PathConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
@@ -45,9 +44,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.flywheel.Flywheel;
-import frc.robot.subsystems.flywheel.FlywheelConstants;
-import frc.robot.util.BallSimulator;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -72,7 +68,6 @@ import org.photonvision.simulation.VisionSystemSim;
 public class RobotContainer {
     // Subsystems
     public final Drive drive;
-    private final Flywheel flywheel;
     // Controller
     private final CommandXboxControllerExtended controller = new CommandXboxControllerExtended(0);
 
@@ -91,7 +86,6 @@ public class RobotContainer {
                     new ModuleIOTalonFX(DriveConstants.BackLeft),
                     new ModuleIOTalonFX(DriveConstants.BackRight));
 
-                flywheel = new Flywheel(FlywheelConstants.getReal());
             }
 
             case SIM -> {
@@ -103,7 +97,6 @@ public class RobotContainer {
                     new ModuleIOSim(DriveConstants.BackLeft),
                     new ModuleIOSim(DriveConstants.BackRight));
 
-                flywheel = new Flywheel(FlywheelConstants.getSim());
             }
 
             default -> {
@@ -115,14 +108,11 @@ public class RobotContainer {
                     new ModuleIO() {},
                     new ModuleIO() {});
 
-                flywheel = new Flywheel(FlywheelConstants.getReplay());
             }
         }
 
         // Configure the button bindings
         configureButtonBindings();
-
-        configureDashboard();
 
     }
 
@@ -134,30 +124,13 @@ public class RobotContainer {
      */
     private void configureButtonBindings()
     {
-        // // Default command, normal field-relative drive
-        // drive.setDefaultCommand(
-        // DriveCommands.joystickDrive(
-        // drive,
-        // () -> -controller.getLeftY(),
-        // () -> -controller.getLeftX(),
-        // () -> -controller.getRightX()));
-    }
-
-    private void configureDashboard()
-    {
-        LoggedTunableNumber ballVel = new LoggedTunableNumber("Ball Sim Velocity (rpm)", 1000);
-        LoggedTunableNumber launchAngle = new LoggedTunableNumber("Shooter/Launch Angle", -45);
-        SmartDashboard.putData("Shoot Ball", Commands
-            .runOnce(() -> BallSimulator.launch(
-                flywheel.getLinearVelocity(),
-                Degrees.of(launchAngle.get()),
-                RobotState.getInstance())));
-
-        SmartDashboard.putData("Shooter Spinup",
-            flywheel.shoot(() -> Rotations.per(Minute).of(ballVel.get())));
-
-        SmartDashboard.putData("Shooter Stop", flywheel.stop());
-
+        // Default command, normal field-relative drive
+        drive.setDefaultCommand(
+            DriveCommands.joystickDrive(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX()));
     }
 
     /**
