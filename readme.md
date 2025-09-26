@@ -12,20 +12,12 @@ In programming, subsystems are used to organize the robot's code. Each subsystem
 ## Step 2: Setting Up the File
 
 1. **Open Your Project**: Open your FRC robot project in your IDE. If you're using VS Code, make sure you have the WPILib extension installed.
-2. **Navigate to the Subsystems Folder**: In the `src/main/java/frc/robot/subsystems` directory, locate or create a folder named `flywheel`. This folder will contain all files related to the Flywheel subsystem.
+2. **Navigate to the Subsystems Folder**: In the `src/main/java/frc/robot/subsystems` directory, create a folder named `flywheel`. This folder will contain all files related to the Flywheel subsystem.
 3. **Create the File**: Inside the `flywheel` folder, create a new Java file named `Flywheel.java`. This file will contain the code for the Flywheel subsystem.
 
 ## Step 3: Writing the Code
 
-### 3.1 Importing Required Libraries
-
-At the top of the file, you need to import libraries that provide the tools to build your subsystem. Here's what each library does:
-- `edu.wpi.first.wpilibj2.command.SubsystemBase`: This is the base class for all subsystems. It provides the structure and functionality needed to integrate the subsystem into the robot's command-based framework.
-- `frc.lib.mechanisms.flywheel.FlywheelMechanism`: This class represents the physical flywheel hardware and provides methods to control it.
-- `frc.lib.util.LoggerHelper`: This utility helps log the current state of the subsystem, which is useful for debugging.
-- Utility classes like `AngularVelocity` and `Current` are used to represent physical quantities in the code.
-
-### 3.2 Defining the Flywheel Class
+### 3.1 Defining the Flywheel Class
 
 Define the `Flywheel` class and extend `SubsystemBase`. This tells the robot code that `Flywheel` is a subsystem:
 ```java
@@ -33,11 +25,11 @@ public class Flywheel extends SubsystemBase {
     // This is where we will define the flywheel mechanism and its behavior.
 }
 ```
-The `SubsystemBase` class provides methods like `periodic()` that are called automatically during the robot's operation.
+The `SubsystemBase` class provides methods like `periodic()` that are called automatically during the robot's operation. You will see a red underline on SubsystemBase, indicating that there is an error associated with it. To fix this, hover over it and Quick Fix, then Import 'SubsystemBase'. This will add an import at the top of the file that tells the program where the information for the SubsystemBase class can be found. 
 
-### 3.3 Adding the Flywheel Mechanism
+### 3.2 Adding the Flywheel Mechanism
 
-The `FlywheelMechanism` class represents the hardware for the flywheel. To use it, create a private field and initialize it in the constructor:
+The `FlywheelMechanism` class represents the hardware for the flywheel. To use it, inside the Flywheel class create a private field and initialize it in a public constructor:
 ```java
 private final FlywheelMechanism io;
 
@@ -47,9 +39,9 @@ public Flywheel(FlywheelMechanism io) {
 ```
 The `FlywheelMechanism` object (`io`) will be used to send commands to the flywheel hardware.
 
-### 3.4 Implementing the `periodic` Method
+### 3.3 Implementing the `periodic` Method
 
-The `periodic` method is called repeatedly (about every 20ms) during the robot's operation. Use it to log the current command and update the flywheel mechanism:
+The `periodic` method is called repeatedly (about every 20ms) during the robot's operation. Use it to log the current command and update the flywheel mechanism's io, add the following method below the class constructor (not inside):
 ```java
 @Override
 public void periodic() {
@@ -59,14 +51,14 @@ public void periodic() {
 ```
 This ensures that the subsystem's state is updated and logged regularly.
 
-### 3.5 Adding Commands
+### 3.4 Adding Commands
 
 Commands are actions that the subsystem can perform. Here are the commands you'll add:
 
 1. **Shoot Command**: Spins the flywheel at maximum velocity. This is useful for launching game pieces.
    ```java
    public Command shoot() {
-       return this.runOnce(() -> io.runVelocity(FlywheelConstants.MAX_VELOCITY,
+       return runOnce(() -> io.runVelocity(FlywheelConstants.MAX_VELOCITY,
            FlywheelConstants.MAX_ACCELERATION, PIDSlot.SLOT_0)).withName("Shoot");
    }
    ```
@@ -80,9 +72,9 @@ Commands are actions that the subsystem can perform. Here are the commands you'l
    }
    ```
 
-### 3.6 Adding Utility Methods
+### 3.5 Adding Utility Methods
 
-Utility methods provide information about the flywheel's state or perform cleanup tasks:
+Utility methods provide information about the flywheel subsystem:
 
 2. **Get Velocity**: Returns the flywheel's current velocity.
    ```java
