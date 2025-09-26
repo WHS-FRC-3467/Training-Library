@@ -44,6 +44,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.flywheel.Flywheel;
+import frc.robot.subsystems.flywheel.FlywheelConstants;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -68,6 +70,8 @@ import org.photonvision.simulation.VisionSystemSim;
 public class RobotContainer {
     // Subsystems
     public final Drive drive;
+
+    private final Flywheel flywheel;
     // Controller
     private final CommandXboxControllerExtended controller = new CommandXboxControllerExtended(0);
 
@@ -86,6 +90,8 @@ public class RobotContainer {
                     new ModuleIOTalonFX(DriveConstants.BackLeft),
                     new ModuleIOTalonFX(DriveConstants.BackRight));
 
+                flywheel = new Flywheel(FlywheelConstants.getReal());
+
             }
 
             case SIM -> {
@@ -97,6 +103,8 @@ public class RobotContainer {
                     new ModuleIOSim(DriveConstants.BackLeft),
                     new ModuleIOSim(DriveConstants.BackRight));
 
+                flywheel = new Flywheel(FlywheelConstants.getSim());
+
             }
 
             default -> {
@@ -107,6 +115,8 @@ public class RobotContainer {
                     new ModuleIO() {},
                     new ModuleIO() {},
                     new ModuleIO() {});
+
+                flywheel = new Flywheel(FlywheelConstants.getReplay());
 
             }
         }
@@ -131,6 +141,8 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX()));
+
+        SmartDashboard.putData("Shoot", flywheel.shoot());
     }
 
     /**
