@@ -1,3 +1,4 @@
-# W8-Library
+# Training-Library
 
-Everything you could need to know is on the [wiki](https://github.com/WHS-FRC-3467/W8-Library/wiki)
+TODO:
+https://marketplace.visualstudio.com/items?itemName=vsls-contrib.codetour
