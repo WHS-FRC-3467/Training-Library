@@ -14,23 +14,40 @@
  */
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.io.motor.MotorIO.PIDSlot;
 import frc.lib.mechanisms.flywheel.FlywheelMechanism;
+import static frc.robot.subsystems.intake.IntakeConstants.MAX_VELOCITY;
 
 public class Intake extends SubsystemBase {
+
     private final FlywheelMechanism<?> io;
 
     Intake(FlywheelMechanism<?> io) {
         this.io = io;
     }
 
-    public Command runVelocity(AngularVelocity velocity) {
+    private void runVelocity(AngularVelocity velocity) {
+        io.runVelocity(velocity, IntakeConstants.MAX_ACCELERATION, PIDSlot.SLOT_0);
+    }
 
-        return this
-            .run(() -> io.runVelocity(velocity, IntakeConstants.MAX_ACCELERATION, PIDSlot.SLOT_0));
+    public Command pull() {
+        return this.startEnd(
+            () -> runVelocity(MAX_VELOCITY),
+            () -> stop());
+    }
+
+    public Command push() {
+        return this.startEnd(
+            () -> runVelocity(RotationsPerSecond.of(-MAX_VELOCITY.in(RotationsPerSecond))),
+            () -> stop());
+    }
+
+    private void stop() {
+        io.runBrake();
     }
 
     @Override

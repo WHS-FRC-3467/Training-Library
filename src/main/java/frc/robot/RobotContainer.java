@@ -98,8 +98,8 @@ public class RobotContainer {
 
         autoChooser.addOption("Wheel Slip Characterization", new WheelSlipAuto(drive));
 
-        SmartDashboard.putData("Intake In", intake.runVelocity(IntakeConstants.MAX_VELOCITY));
-        SmartDashboard.putData("Intake Out", intake.runVelocity(IntakeConstants.NEG_MAX_VELOCITY));
+        SmartDashboard.putData("Intake Push", intake.push());
+        SmartDashboard.putData("Intake Pull", intake.pull());
 
 
         // Configure the button bindings
@@ -121,15 +121,11 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX()));
 
-        controller.rightTrigger().whileTrue(
-            intake.runVelocity(IntakeConstants.MAX_VELOCITY));
-        controller.leftTrigger().whileTrue(
-            intake.runVelocity(IntakeConstants.NEG_MAX_VELOCITY));
-        controller.rightBumper();
-        controller.povUp();
-        controller.povDown();
-        controller.povRight();
-        controller.povLeft();
+        controller.a().whileTrue(
+            intake.pull());
+        controller.b().whileTrue(
+            intake.push());
+
     }
 
     /**
