@@ -53,7 +53,7 @@ public class RobotContainer {
 
     // Subsystems
     public final Drive drive;
-    
+
     private final LEDs leds;
 
     // Controller
@@ -82,9 +82,8 @@ public class RobotContainer {
         // Default - No Auto
         autoChooser.addDefaultOption("None", new NoneAuto());
 
-       
-     
-        
+
+
         autoChooser.onChange(auto -> {
             autoPreviewField.getObject("path")
                 .setPoses(auto.getAllPathPoses().stream()
