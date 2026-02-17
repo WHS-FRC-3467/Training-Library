@@ -29,6 +29,8 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.autos.*;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.leds.LEDs;
 import frc.robot.subsystems.leds.LEDsConstants;
 import frc.robot.subsystems.vision.VisionConstants;
@@ -53,8 +55,8 @@ public class RobotContainer {
 
     // Subsystems
     public final Drive drive;
-
     private final LEDs leds;
+    private final Intake intake;
 
     // Controller
     private final CommandXboxControllerExtended controller =
@@ -71,9 +73,10 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
-        drive = DriveConstants.get();
         VisionConstants.create();
+        drive = DriveConstants.get();
         leds = LEDsConstants.get();
+        intake = IntakeConstants.get();
 
 
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
@@ -95,6 +98,8 @@ public class RobotContainer {
 
         autoChooser.addOption("Wheel Slip Characterization", new WheelSlipAuto(drive));
 
+        SmartDashboard.putData("Intake In", intake.runVelocity(IntakeConstants.MAX_VELOCITY));
+        SmartDashboard.putData("Intake Out", intake.runVelocity(IntakeConstants.NEG_MAX_VELOCITY));
 
 
         // Configure the button bindings
@@ -116,8 +121,10 @@ public class RobotContainer {
                 () -> -controller.getLeftX(),
                 () -> -controller.getRightX()));
 
-        controller.rightTrigger();
-        controller.leftTrigger();
+        controller.rightTrigger().whileTrue(
+            intake.runVelocity(IntakeConstants.MAX_VELOCITY));
+        controller.leftTrigger().whileTrue(
+            intake.runVelocity(IntakeConstants.NEG_MAX_VELOCITY));
         controller.rightBumper();
         controller.povUp();
         controller.povDown();

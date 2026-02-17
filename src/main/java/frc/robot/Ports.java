@@ -33,9 +33,10 @@ public class Ports {
     // - We assign CAN ID 0 to the pigeon
     public static final CANBus DRIVETRAIN_BUS = new CANBus("Drivetrain");
 
-    public static final Device.CAN lights = new CAN(7, "Drivetrain");
+    public static final Device.CAN lights = new CAN(1, "Drivetrain");
 
-    public static final Device.CAN pdh = new CAN(40, "rio");
+    public static final Device.CAN pdh = new CAN(2, "rio");
+    public static final Device.CAN intake = new CAN(3, "rio");
 
 
 }
