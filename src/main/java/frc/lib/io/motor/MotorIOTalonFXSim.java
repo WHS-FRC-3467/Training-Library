@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -32,7 +32,8 @@ import frc.lib.util.Device.CAN;
  */
 public class MotorIOTalonFXSim extends MotorIOTalonFX implements MotorIOSim {
 
-    private double gearRatio;
+    private double rotorToSensorRatio;
+    private double sensorToMechanismRatio;
     private TalonFXSimState simState;
 
     /**
@@ -44,47 +45,48 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements MotorIOSim {
      * @param followerData Configuration data for the follower(s)
      */
     public MotorIOTalonFXSim(String name, TalonFXConfiguration config, CAN main,
-        TalonFXFollower... followerData)
-    {
+        TalonFXFollower... followerData) {
         super(name, config, main, followerData);
 
-        gearRatio = config.Feedback.RotorToSensorRatio * config.Feedback.SensorToMechanismRatio;
+        rotorToSensorRatio =
+            config.Feedback.RotorToSensorRatio;
+        sensorToMechanismRatio =
+            config.Feedback.SensorToMechanismRatio;
         simState = super.motor.getSimState();
     }
 
     @Override
-    public void setPosition(Angle position)
-    {
-        simState.setRawRotorPosition(position.times(gearRatio));
+    public void setPosition(Angle position) {
+        simState.setRawRotorPosition(position.times(rotorToSensorRatio * sensorToMechanismRatio));
     }
 
     @Override
-    public void setRotorVelocity(AngularVelocity velocity)
-    {
+    public void setRotorVelocity(AngularVelocity velocity) {
         simState.setRotorVelocity(velocity);
     }
 
     @Override
-    public void setRotorAcceleration(AngularAcceleration acceleration)
-    {
+    public void setRotorAcceleration(AngularAcceleration acceleration) {
         simState.setRotorAcceleration(acceleration);
     }
 
     @Override
-    public double getGearRatio()
-    {
-        return gearRatio;
+    public double getRotorToSensorRatio() {
+        return rotorToSensorRatio;
     }
 
     @Override
-    public void setEncoderPosition(Angle position)
-    {
-        super.setEncoderPosition(position.times(gearRatio));
+    public double getSensorToMechanismRatio() {
+        return sensorToMechanismRatio;
     }
 
     @Override
-    public void updateInputs(MotorInputs inputs)
-    {
+    public void setEncoderPosition(Angle position) {
+        super.setEncoderPosition(position.times(rotorToSensorRatio * sensorToMechanismRatio));
+    }
+
+    @Override
+    public void updateInputs(MotorInputs inputs) {
         inputs.connected = BaseStatusSignal.refreshAll(
             super.position,
             super.velocity,
@@ -116,12 +118,16 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements MotorIOSim {
 
         inputs.positionError = isRunningPositionControl
             ? Rotations.of(closedLoopErrorValue)
-            : null;
+            : Rotations.zero();
 
         inputs.activeTrajectoryPosition =
             isRunningPositionControl && isRunningMotionMagic
                 ? Rotations.of(closedLoopTargetValue)
-                : null;
+                : Rotations.zero();
+
+        inputs.goalPosition = isRunningPositionControl
+            ? goalPosition
+            : Rotations.zero();
 
         if (isRunningVelocityControl) {
             inputs.velocityError = RotationsPerSecond.of(closedLoopErrorValue);
@@ -132,16 +138,10 @@ public class MotorIOTalonFXSim extends MotorIOTalonFX implements MotorIOSim {
                 targetVelocity - inputs.velocity.in(RotationsPerSecond));
             inputs.activeTrajectoryVelocity = RotationsPerSecond.of(targetVelocity);
         } else {
-            inputs.velocityError = null;
-            inputs.activeTrajectoryVelocity = null;
+            inputs.velocityError = RotationsPerSecond.zero();
+            inputs.activeTrajectoryVelocity = RotationsPerSecond.zero();
         }
 
-        inputs.controlType = super.getCurrentControlType();
-    }
-
-    @Override
-    public void close()
-    {
-        super.motor.close();
+        inputs.controlType = getCurrentControlType();
     }
 }

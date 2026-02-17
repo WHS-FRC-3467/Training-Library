@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -15,6 +15,9 @@
 
 package frc.robot.subsystems.drive;
 
+import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -41,7 +44,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.CANUpdateThread;
-import java.util.Queue;
+import frc.robot.Ports;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -51,6 +54,8 @@ import java.util.Queue;
  * Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
 public class ModuleIOTalonFX implements ModuleIO {
+    private static final Logger LOGGER = Logger.getLogger(ModuleIOTalonFX.class.getName());
+
     private final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
 
     // Hardware objects
@@ -96,15 +101,18 @@ public class ModuleIOTalonFX implements ModuleIO {
     // Configuration Thread
     CANUpdateThread updateThread = new CANUpdateThread();
 
+    /**
+     * Constructs a new ModuleIOTalonFX instance.
+     *
+     * @param constants Module-specific constants for configuring hardware devices
+     */
     public ModuleIOTalonFX(
         SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants)
     {
         this.constants = constants;
-        driveTalon =
-            new TalonFX(constants.DriveMotorId, DriveConstants.drivetrainConstants.CANBusName);
-        turnTalon =
-            new TalonFX(constants.SteerMotorId, DriveConstants.drivetrainConstants.CANBusName);
-        cancoder = new CANcoder(constants.EncoderId, DriveConstants.drivetrainConstants.CANBusName);
+        driveTalon = new TalonFX(constants.DriveMotorId, Ports.DRIVETRAIN_BUS);
+        turnTalon = new TalonFX(constants.SteerMotorId, Ports.DRIVETRAIN_BUS);
+        cancoder = new CANcoder(constants.EncoderId, Ports.DRIVETRAIN_BUS);
 
         // Configure drive motor
         var driveConfig = constants.DriveMotorInitialConfigs;
@@ -119,9 +127,17 @@ public class ModuleIOTalonFX implements ModuleIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
         updateThread
-            .CTRECheckErrorAndRetry(() -> driveTalon.getConfigurator().apply(driveConfig, 0.25));
+            .CTRECheckErrorAndRetry(() -> driveTalon.getConfigurator().apply(driveConfig, 0.25))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
         updateThread
-            .CTRECheckErrorAndRetry(() -> driveTalon.setPosition(0.0, 0.25));
+            .CTRECheckErrorAndRetry(() -> driveTalon.setPosition(0.0, 0.25))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
 
         // Configure turn motor
         var turnConfig = new TalonFXConfiguration();
@@ -146,7 +162,11 @@ public class ModuleIOTalonFX implements ModuleIO {
             ? InvertedValue.Clockwise_Positive
             : InvertedValue.CounterClockwise_Positive;
         updateThread
-            .CTRECheckErrorAndRetry(() -> turnTalon.getConfigurator().apply(turnConfig, 0.25));
+            .CTRECheckErrorAndRetry(() -> turnTalon.getConfigurator().apply(turnConfig, 0.25))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
 
         // Configure CANCoder
         CANcoderConfiguration cancoderConfig = constants.EncoderInitialConfigs;
@@ -192,8 +212,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     }
 
     @Override
-    public void updateInputs(ModuleIOInputs inputs)
-    {
+    public void updateInputs(ModuleIOInputs inputs) {
         // Refresh all signals
         var driveStatus = BaseStatusSignal.refreshAll(drivePosition, driveVelocity,
             driveAppliedVolts, driveCurrent);

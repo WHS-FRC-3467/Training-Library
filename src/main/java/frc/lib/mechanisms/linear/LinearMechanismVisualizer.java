@@ -6,13 +6,10 @@ package frc.lib.mechanisms.linear;
 
 import static edu.wpi.first.units.Units.Meters;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -21,7 +18,21 @@ import frc.lib.mechanisms.linear.LinearMechanism.LinearMechCharacteristics;
 
 /**
  * A visualizer for linear mechanisms that displays the current distance, trajectory, and goal
- * distance using a LoggedMechanism2d.
+ * distance using a LoggedMechanism2d. Supports mechanisms at any orientation angle.
+ *
+ * <p>
+ * The orientation uses WPILib's Rotation3d convention (counter-clockwise positive around Y-axis):
+ * <ul>
+ * <li>The mechanism extends along the positive X-axis in its local frame</li>
+ * <li>Pitch (Y-axis rotation) determines the angle from horizontal for 2D visualization</li>
+ * <li>A pitch of 0° represents a horizontal mechanism extending forward</li>
+ * <li>A pitch of -90° (-π/2 radians) represents a vertical mechanism extending upward</li>
+ * <li>A pitch of 90° (π/2 radians) represents a vertical mechanism extending downward</li>
+ * </ul>
+ *
+ * <p>
+ * For 3D pose calculation, the distance is projected along the orientation direction by rotating a
+ * vector [distance, 0, 0] by the orientation Rotation3d.
  */
 public class LinearMechanismVisualizer {
 
@@ -40,19 +51,22 @@ public class LinearMechanismVisualizer {
     private final LoggedMechanismLigament2d upperBoundArm;
     private final String name;
 
-    private final Pose3d offset;
+    private Rotation3d orientation;
 
-    public LinearMechanismVisualizer(String name, LinearMechCharacteristics characteristics)
-    {
+    public LinearMechanismVisualizer(String name, LinearMechCharacteristics characteristics) {
         this.name = name;
-        mechanism = new LoggedMechanism2d(3.0, 3.0, new Color8Bit(Color.kBlack));
-        LoggedMechanismRoot2d root = mechanism.getRoot(name + " root", 1.5, 0.0);
+        this.orientation = characteristics.orientation();
 
-        offset = new Pose3d(characteristics.offset(), Rotation3d.kZero);
+        // Calculate the 2D angle for mechanism visualization (using pitch as the primary angle)
+        // WPILib uses counter-clockwise positive, so pitch directly maps to visualization angle
+        double visualAngleDegrees = Math.toDegrees(-orientation.getY());
+
+        mechanism = new LoggedMechanism2d(3.0, 3.0, new Color8Bit(Color.kBlack));
+        LoggedMechanismRoot2d root = mechanism.getRoot(name + " root", 1.5, 1.5);
 
         lowerBound =
             new LoggedMechanismLigament2d(name + "lowerBound",
-                characteristics.minDistance().in(Meters), 90.0, 3,
+                characteristics.minDistance().in(Meters), visualAngleDegrees, 3,
                 new Color8Bit(Color.kWhite));
 
         lowerBoundArm = new LoggedMechanismLigament2d(name + "lowerBoundArm", ARM_LENGTH, -90, 3,
@@ -61,7 +75,7 @@ public class LinearMechanismVisualizer {
 
         upperBound =
             new LoggedMechanismLigament2d(name + "upperBound",
-                characteristics.maxDistance().in(Meters), 90.0, 3,
+                characteristics.maxDistance().in(Meters), visualAngleDegrees, 3,
                 new Color8Bit(Color.kWhite));
 
         upperBoundArm =
@@ -70,7 +84,7 @@ public class LinearMechanismVisualizer {
 
         measured =
             new LoggedMechanismLigament2d(name + "measured",
-                characteristics.startingDistance().in(Meters), 90.0,
+                characteristics.startingDistance().in(Meters), visualAngleDegrees,
                 3,
                 new Color8Bit(Color.kGreen));
 
@@ -80,7 +94,7 @@ public class LinearMechanismVisualizer {
 
         trajectory =
             new LoggedMechanismLigament2d(name + "trajectory",
-                characteristics.startingDistance().in(Meters), 90.0,
+                characteristics.startingDistance().in(Meters), visualAngleDegrees,
                 3,
                 new Color8Bit(Color.kYellow));
 
@@ -90,7 +104,7 @@ public class LinearMechanismVisualizer {
 
         goal = new LoggedMechanismLigament2d(name + "goal",
             characteristics.startingDistance().in(Meters),
-            90.0, 3,
+            visualAngleDegrees, 3,
             new Color8Bit(Color.kRed));
 
         goalArm =
@@ -109,23 +123,42 @@ public class LinearMechanismVisualizer {
         goal.append(goalArm);
     }
 
-    private void update()
-    {
-        SmartDashboard.putData(name + " Visualizer", mechanism);
-        Logger.recordOutput(name + "/Pose3d",
-            offset.plus(new Transform3d(measured.getLength(), 0, 0,
-                Rotation3d.kZero)));
+    /**
+     * Updates the 2D visualization angle based on the current orientation.
+     */
+    private void updateVisualizationAngle() {
+        // Convert the pitch (Y rotation) to a 2D visualization angle
+        // WPILib uses counter-clockwise positive, so pitch directly maps to visualization angle
+        double visualAngleDegrees = Math.toDegrees(-orientation.getY());
+
+        lowerBound.setAngle(visualAngleDegrees);
+        upperBound.setAngle(visualAngleDegrees);
+        measured.setAngle(visualAngleDegrees);
+        trajectory.setAngle(visualAngleDegrees);
+        goal.setAngle(visualAngleDegrees);
     }
 
-    public void setMeasuredDistance(Distance distance)
-    {
+    private void update() {
+        SmartDashboard.putData(name + " Visualizer", mechanism);
+    }
+
+    /**
+     * Sets the measured distance of the linear mechanism.
+     *
+     * @param distance The measured distance to display
+     */
+    public void setMeasuredDistance(Distance distance) {
         measured.setLength(distance.in(Meters));
 
         update();
     }
 
-    public void setTrajectoryDistance(Optional<Distance> distance)
-    {
+    /**
+     * Sets the trajectory distance setpoint for the linear mechanism.
+     *
+     * @param distance Optional trajectory distance, empty to hide
+     */
+    public void setTrajectoryDistance(Optional<Distance> distance) {
         if (distance.isEmpty()) {
             trajectoryArm.setLength(0.0);
         }
@@ -138,8 +171,12 @@ public class LinearMechanismVisualizer {
         update();
     }
 
-    public void setGoalDistance(Optional<Distance> distance)
-    {
+    /**
+     * Sets the goal distance for the linear mechanism.
+     *
+     * @param distance Optional goal distance, empty to hide
+     */
+    public void setGoalDistance(Optional<Distance> distance) {
         if (distance.isEmpty()) {
             goalArm.setLength(0.0);
         }
@@ -150,5 +187,26 @@ public class LinearMechanismVisualizer {
         });
 
         update();
+    }
+
+    /**
+     * Sets the orientation of the linear mechanism. This allows dynamic updates for pivoting
+     * mechanisms.
+     *
+     * @param orientation The new orientation of the mechanism
+     */
+    public void setOrientation(Rotation3d orientation) {
+        this.orientation = orientation;
+        updateVisualizationAngle();
+        update();
+    }
+
+    /**
+     * Gets the current orientation of the linear mechanism.
+     *
+     * @return The current orientation
+     */
+    public Rotation3d getOrientation() {
+        return orientation;
     }
 }

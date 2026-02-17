@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -15,8 +15,14 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotBase;
 import frc.robot.subsystems.drive.DriveConstants;
 
@@ -25,6 +31,7 @@ import frc.robot.subsystems.drive.DriveConstants;
  * on a roboRIO. Change the value of "simMode" to switch between "sim" (physics sim) and "replay"
  * (log replay from a file).
  */
+
 public final class Constants {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
@@ -42,15 +49,15 @@ public final class Constants {
         REPLAY
     }
 
+    public static boolean disableHAL = false;
+
     public static class RobotConstants {
         public static String serial;
         public static boolean isComp;
         public static boolean isAlpha;
 
-        // TODO: Fill in with real serial number prefixes. Figure out by displaying/logging String
-        // serial.
-        public static final String compSerial = "0001";
-        public static final String alphaSerial = "0000";
+        public static final String COMP_SERIAL = "0001";
+        public static final String ALPHA_SERIAL = "0000";
 
         static {
             if (Robot.isReal()) {
@@ -59,8 +66,8 @@ public final class Constants {
             } else {
                 serial = "3467";
             }
-            RobotConstants.isComp = serial.startsWith(RobotConstants.compSerial);
-            RobotConstants.isAlpha = serial.startsWith(RobotConstants.alphaSerial);
+            RobotConstants.isComp = serial.startsWith(RobotConstants.COMP_SERIAL);
+            RobotConstants.isAlpha = serial.startsWith(RobotConstants.ALPHA_SERIAL);
         }
     }
 
@@ -75,13 +82,12 @@ public final class Constants {
 
     public static final class PathConstants {
 
-        public static final double PATHGENERATION_DRIVE_TOLERANCE = Units.inchesToMeters(3.0); // 3
-                                                                                               // in
-                                                                                               // robot
-                                                                                               // position
-                                                                                               // tolerance
-        public static final double PATHGENERATION_ROT_TOLERANCE_DEGREES = 5.0; // 5 degrees rotation
-                                                                               // tolerance
+        public static final Distance STARTING_POSE_DRIVE_TOLERANCE =
+            Inches.of(3.0); // For auto
+        public static final Angle STARTING_POSE_ROT_TOLERANCE_DEGREES = Degrees.of(5.0);
+
+        public static final Distance PATHGENERATION_DRIVE_TOLERANCE = Inches.of(3.0);
+        public static final Angle PATHGENERATION_ROT_TOLERANCE = Degrees.of(5.0);
         // Tune the maxAcceleration, maxAngularVelocityRadPerSec, and
         // maxAngularAccelerationRacPerSecSq constraints for pathfinding
         public static final PathConstraints ON_THE_FLY_PATH_CONSTRAINTS = new PathConstraints(
@@ -90,4 +96,21 @@ public final class Constants {
             Units.degreesToRadians(540),
             Units.degreesToRadians(720));
     }
+
+    public static final Distance FULL_ROBOT_WIDTH = Inches.of(27.0 + 3.25);
+    public static final Distance FULL_ROBOT_LENGTH = Inches.of(27.0 + 3.25);
+    public static final Distance BUMPER_HEIGHT = Inches.of(4.0);
+    public static final Transform3d LEFT_SHOOTER_EXIT_TRANSFORM =
+        new Transform3d(
+            Inches.of(-7.346),
+            Inches.of(3.84),
+            Inches.of(22),
+            new Rotation3d(0, 0, 0));
+
+    public static final Transform3d RIGHT_SHOOTER_EXIT_TRANSFORM =
+        new Transform3d(
+            Inches.of(-7.346),
+            Inches.of(-3.84),
+            Inches.of(22),
+            new Rotation3d(0, 0, 0));
 }

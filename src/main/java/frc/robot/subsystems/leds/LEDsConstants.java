@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -36,10 +36,11 @@ import edu.wpi.first.wpilibj.util.Color;
 import frc.lib.io.lights.LightsIO;
 import frc.lib.io.lights.LightsIOCandle;
 import frc.lib.io.lights.LightsIOSim;
+import frc.robot.Constants;
 import frc.robot.Ports;
 
 public class LEDsConstants {
-    public static final String NAME = "MainLEDs";
+    public static final String NAME = "LEDs";
 
     public static final LEDSegment CANDLE_LEDS = new LEDSegment(0, 7, 0);
     public static final LEDSegment FRONT_STRIP = new LEDSegment(8, 10, 1);
@@ -54,23 +55,26 @@ public class LEDsConstants {
             .withStripType(StripTypeValue.RGB)
             .withLossOfSignalBehavior(LossOfSignalBehaviorValue.DisableLEDs));
 
-    public static final LightsIOCandle getLightsIOReal()
-    {
-        return new LightsIOCandle(NAME, Ports.lights, CANDLE_CONFIG);
+    /**
+     * Factory method to create an LEDs subsystem instance. Creates the appropriate lights IO based
+     * on the current robot mode (REAL, SIM, or REPLAY).
+     *
+     * @return A fully configured LEDs subsystem
+     */
+    public static LEDs get() {
+        switch (Constants.currentMode) {
+            case REAL:
+                return new LEDs(new LightsIOCandle(Ports.lights, CANDLE_CONFIG));
+            case SIM:
+                return new LEDs(new LightsIOSim());
+            case REPLAY:
+                return new LEDs(new LightsIO() {});
+            default:
+                throw new IllegalStateException("Unrecognized Robot Mode");
+        }
     }
 
-    public static final LightsIOSim getLightsIOSim()
-    {
-        return new LightsIOSim(NAME);
-    }
-
-    public static final LightsIO getLightsIOReplay()
-    {
-        return new LightsIO() {};
-    }
-
-    public record LEDSegment(int startIndex, int endIndex, int animationSlot) {
-    };
+    public record LEDSegment(int startIndex, int endIndex, int animationSlot) {};
 
     // Animations
 

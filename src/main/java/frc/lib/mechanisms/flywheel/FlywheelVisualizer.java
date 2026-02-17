@@ -16,19 +16,19 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
  * The {@code FlywheelVisualizer} class is responsible for visualizing a flywheel mechanism using
  * the Mechanism2d library. It creates a graphical representation of the flywheel and its
  * components, which can be displayed on the SmartDashboard.
- * 
+ *
  * <p>
  * This class initializes a {@code LoggedMechanism2d} object with specified dimensions and
  * constructs the flywheel mechanism using {@code LoggedMechanismLigament2d} objects. The flywheel
  * is represented as a series of connected ligaments forming a circular structure.
- * 
+ *
  * <p>
  * Example Usage:
- * 
+ *
  * <pre>
  * FlywheelVisualizer visualizer = new FlywheelVisualizer("Flywheel");
  * </pre>
- * 
+ *
  */
 public class FlywheelVisualizer {
 
@@ -39,8 +39,7 @@ public class FlywheelVisualizer {
     private static double HEIGHT = .50; // Controls the height of the mech2d SmartDashboard
     private static double WIDTH = .50; // Controls width of the mech2d SmartDashboard
 
-    public FlywheelVisualizer(String name)
-    {
+    public FlywheelVisualizer(String name) {
         this.name = name;
         mechanism = new LoggedMechanism2d(WIDTH, HEIGHT);
 
@@ -83,14 +82,22 @@ public class FlywheelVisualizer {
                 new Color8Bit(Color.kAliceBlue)));
     }
 
-    public void setAngle(Angle angle)
-    {
+    /**
+     * Sets the rotation angle of the flywheel visualization.
+     *
+     * @param angle The angle to display
+     */
+    public void setAngle(Angle angle) {
         roller.setAngle(angle.in(Degrees));
         SmartDashboard.putData(name + " Visualizer", mechanism); // Creates mech2d in SmartDashboard
     }
 
-    public void setColor(Color color)
-    {
+    /**
+     * Sets the background color of the visualization.
+     *
+     * @param color The background color to use
+     */
+    public void setColor(Color color) {
         mechanism.setBackgroundColor(new Color8Bit(color));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -31,8 +31,7 @@ public class Lights {
      *
      * @param io the IO to interact with.
      */
-    public Lights(LightsIO io)
-    {
+    public Lights(LightsIO io) {
         this.io = io;
     }
 
@@ -41,8 +40,7 @@ public class Lights {
      *
      * @param request {@link ControlRequest}
      */
-    public void setAnimation(ControlRequest request)
-    {
+    public void setAnimation(ControlRequest request) {
         io.setAnimation(request);
     }
 
@@ -51,8 +49,7 @@ public class Lights {
      *
      * @param requests {@link ControlRequest}
      */
-    public void setAnimations(List<ControlRequest> requests)
-    {
+    public void setAnimations(List<ControlRequest> requests) {
         for (ControlRequest request : requests) {
             io.setAnimation(request);
         }

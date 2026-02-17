@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -19,18 +19,19 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
+import frc.lib.util.PID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -38,7 +39,7 @@ import lombok.Getter;
  * Standardized interface for motor controllers used in FRC. Supports multiple control modes and
  * telemetry reporting.
  */
-public interface MotorIO {
+public interface MotorIO extends AutoCloseable {
 
     @Getter
     @AllArgsConstructor
@@ -77,25 +78,17 @@ public interface MotorIO {
         /** Motor temperature in degrees. */
         public Temperature temperature = Celsius.of(0.0);
         /** Error in position */
-        public Angle positionError = null;
+        public Angle positionError = Rotations.zero();
         /** Error in velocity */
-        public AngularVelocity velocityError = null;
+        public AngularVelocity velocityError = RotationsPerSecond.zero();
         /** Active trajectory position in rotations */
-        public Angle activeTrajectoryPosition = null;
+        public Angle activeTrajectoryPosition = Rotations.zero();
         /** Active trajectory velocity in rotations per second. */
-        public AngularVelocity activeTrajectoryVelocity = null;
+        public AngularVelocity activeTrajectoryVelocity = RotationsPerSecond.zero();
+        /** Goal position */
+        public Angle goalPosition = Rotations.zero();
         /** Current control type */
-        public ControlType controlType = null;
-    }
-
-    /**
-     * Getter for the name of the motor
-     * 
-     * @return The name of the motor
-     */
-    public default String getName()
-    {
-        return "";
+        public ControlType controlType = ControlType.BRAKE;
     }
 
     /**
@@ -104,36 +97,31 @@ public interface MotorIO {
      *
      * @param inputs The structure to populate with updated sensor values.
      */
-    public default void updateInputs(MotorInputs inputs)
-    {}
+    public default void updateInputs(MotorInputs inputs) {}
 
     /**
      * Sets the motor to coast mode.
      */
-    public default void runCoast()
-    {}
+    public default void runCoast() {}
 
     /**
      * Sets the motor to brake mode.
      */
-    public default void runBrake()
-    {}
+    public default void runBrake() {}
 
     /**
      * Runs the motor using direct voltage control.
      *
      * @param voltage Desired voltage output.
      */
-    public default void runVoltage(Voltage voltage)
-    {}
+    public default void runVoltage(Voltage voltage) {}
 
     /**
      * Runs the motor with a specified current output.
      *
      * @param current Desired torque-producing current.
      */
-    public default void runCurrent(Current current)
-    {}
+    public default void runCurrent(Current current) {}
 
     /**
      * Runs the motor with a specified current output and duty cycle.
@@ -141,30 +129,22 @@ public interface MotorIO {
      * @param current Desired torque-producing current.
      * @param dutyCycle Desired dutycycle of current output, limiting top speed
      */
-    public default void runCurrent(Current current, double dutyCycle)
-    {}
+    public default void runCurrent(Current current, double dutyCycle) {}
 
     /**
      * Runs the motor using duty cycle (percentage of available voltage).
      *
-     * @param dutyCycle Fractional output between 0 and 1.
+     * @param dutyCycle Fractional output between -1 and 1.
      */
-    public default void runDutyCycle(double dutyCycle)
-    {}
+    public default void runDutyCycle(double dutyCycle) {}
 
     /**
      * Runs the motor to a specific position.
      *
      * @param position Target position.
-     * @param cruiseVelocity Cruise velocity.
-     * @param acceleration Max acceleration.
-     * @param maxJerk Max jerk (rate of acceleration).
      * @param slot PID slot index.
      */
-    public default void runPosition(Angle position, AngularVelocity cruiseVelocity,
-        AngularAcceleration acceleration,
-        Velocity<AngularAccelerationUnit> maxJerk, PIDSlot slot)
-    {}
+    public default void runPosition(Angle position, PIDSlot slot) {}
 
     /**
      * Runs the motor at a target velocity.
@@ -174,14 +154,23 @@ public interface MotorIO {
      * @param slot PID slot index.
      */
     public default void runVelocity(AngularVelocity velocity, AngularAcceleration acceleration,
-        PIDSlot slot)
-    {}
+        PIDSlot slot) {}
 
     /**
      * Sets the position of the motor's internal encoder
-     * 
+     *
      * @param position Desired position to set encoder to
      */
-    public default void setEncoderPosition(Angle position)
-    {}
+    public default void setEncoderPosition(Angle position) {}
+
+    /**
+     * Updates one PID slot on the motor
+     *
+     * @param slot The slot to update
+     * @param pid The PID to set
+     */
+    public default void setPID(PIDSlot slot, PID pid) {}
+
+    @Override
+    public default void close() {}
 }

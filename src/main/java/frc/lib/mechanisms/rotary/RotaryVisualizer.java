@@ -11,13 +11,10 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import java.util.Optional;
-import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
@@ -40,16 +37,12 @@ public class RotaryVisualizer {
 
     private final double armLength;
 
-    private final Pose3d offset;
-
-    public RotaryVisualizer(String name, RotaryMechCharacteristics constants)
-    {
+    public RotaryVisualizer(String name, RotaryMechCharacteristics constants) {
         this.name = name;
         mechanism = new LoggedMechanism2d(3.0, 3.0, new Color8Bit(Color.kBlack));
         LoggedMechanismRoot2d root = mechanism.getRoot(name + " root", 1.5, 1.5);
 
         armLength = constants.armLength().in(Meters);
-        offset = new Pose3d(constants.offset(), Rotation3d.kZero);
 
         if (constants.maxAngle().minus(constants.minAngle()).in(Rotations) < 1) {
             lowerBound =
@@ -96,23 +89,27 @@ public class RotaryVisualizer {
         root.append(goal);
     }
 
-    private void update()
-    {
+    private void update() {
         SmartDashboard.putData(name + " Visualizer", mechanism);
-        Logger.recordOutput(name + "/Pose3d",
-            offset.rotateBy(
-                new Rotation3d(Degrees.of(measured.getAngle()), Degrees.zero(), Degrees.zero())));
     }
 
-    public void setCurrentAngle(Angle angle)
-    {
+    /**
+     * Sets the current measured angle of the rotary mechanism.
+     *
+     * @param angle The measured angle to display
+     */
+    public void setCurrentAngle(Angle angle) {
         measured.setAngle(Rotation2d.fromRadians(angle.in(Radians)));
 
         update();
     }
 
-    public void setTrajectoryAngle(Optional<Angle> angle)
-    {
+    /**
+     * Sets the trajectory angle setpoint for the rotary mechanism.
+     *
+     * @param angle Optional trajectory angle, empty to hide
+     */
+    public void setTrajectoryAngle(Optional<Angle> angle) {
         if (angle.isEmpty()) {
             trajectory.setLength(0.0);
         }
@@ -125,8 +122,12 @@ public class RotaryVisualizer {
         update();
     }
 
-    public void setGoalAngle(Optional<Angle> angle)
-    {
+    /**
+     * Sets the goal angle for the rotary mechanism.
+     *
+     * @param angle Optional goal angle, empty to hide
+     */
+    public void setGoalAngle(Optional<Angle> angle) {
         if (angle.isEmpty()) {
             goal.setLength(0.0);
         }

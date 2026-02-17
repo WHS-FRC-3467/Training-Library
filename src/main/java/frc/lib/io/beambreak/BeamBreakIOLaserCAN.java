@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -16,6 +16,8 @@
 package frc.lib.io.beambreak;
 
 import static edu.wpi.first.units.Units.Millimeters;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import au.grapplerobotics.interfaces.LaserCanInterface;
 import au.grapplerobotics.interfaces.LaserCanInterface.Measurement;
 import au.grapplerobotics.interfaces.LaserCanInterface.RangingMode;
@@ -27,14 +29,13 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.lib.util.Device;
 import frc.lib.util.CANUpdateThread;
 import frc.lib.util.LaserCANConfigurator;
-import lombok.Getter;
 
 /**
  * A beam break sensor implementation that uses a LaserCAN
  */
 public class BeamBreakIOLaserCAN implements BeamBreakIO {
-    @Getter
-    private final String name;
+    private static final Logger LOGGER = Logger.getLogger(BeamBreakIOLaserCAN.class.getName());
+
     private final LaserCANConfigurator laserCAN;
     private final Distance triggerDistance;
 
@@ -54,9 +55,7 @@ public class BeamBreakIOLaserCAN implements BeamBreakIO {
      */
     public BeamBreakIOLaserCAN(Device.CAN id, String name, Distance triggerDistance,
         RangingMode rangingMode,
-        RegionOfInterest regionOfInterest, TimingBudget timingBudget)
-    {
-        this.name = name;
+        RegionOfInterest regionOfInterest, TimingBudget timingBudget) {
         this.triggerDistance = triggerDistance;
 
         laserCANOnWrongBusAlert =
@@ -70,15 +69,28 @@ public class BeamBreakIOLaserCAN implements BeamBreakIO {
 
         laserCAN = new LaserCANConfigurator(id.id());
 
-        updateThread.LaserCANCheckErrorAndRetry(() -> laserCAN.setRangingMode(rangingMode));
+        updateThread.laserCANCheckErrorAndRetry(() -> laserCAN.setRangingMode(rangingMode))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
+
         updateThread
-            .LaserCANCheckErrorAndRetry(() -> laserCAN.setRegionOfInterest(regionOfInterest));
-        updateThread.LaserCANCheckErrorAndRetry(() -> laserCAN.setTimingBudget(timingBudget));
+            .laserCANCheckErrorAndRetry(() -> laserCAN.setRegionOfInterest(regionOfInterest))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
+
+        updateThread.laserCANCheckErrorAndRetry(() -> laserCAN.setTimingBudget(timingBudget))
+            .exceptionally(ex -> {
+                LOGGER.log(Level.SEVERE, ex.toString(), ex);
+                return null;
+            });
     }
 
     @Override
-    public void updateInputs(BeamBreakInputs inputs)
-    {
+    public void updateInputs(BeamBreakInputs inputs) {
         Measurement measure = laserCAN.getMeasurement();
 
         if (measure == null) {

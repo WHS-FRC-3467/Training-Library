@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -19,6 +19,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 
 import java.util.ArrayList;
@@ -51,31 +52,37 @@ public class PhoenixOdometryThread extends Thread {
         new CANBus(DriveConstants.drivetrainConstants.CANBusName).isNetworkFD();
     private static PhoenixOdometryThread instance = null;
 
-    public static PhoenixOdometryThread getInstance()
-    {
+    /**
+     * Returns the singleton instance of PhoenixOdometryThread.
+     *
+     * @return The PhoenixOdometryThread instance
+     */
+    public static PhoenixOdometryThread getInstance() {
         if (instance == null) {
             instance = new PhoenixOdometryThread();
         }
         return instance;
     }
 
-    private PhoenixOdometryThread()
-    {
+    private PhoenixOdometryThread() {
         setName("PhoenixOdometryThread");
         setDaemon(true);
     }
 
     @Override
-    public synchronized void start()
-    {
+    public synchronized void start() {
         if (timestampQueues.size() > 0) {
             super.start();
         }
     }
 
-    /** Registers a Phoenix signal to be read from the thread. */
-    public Queue<Double> registerSignal(StatusSignal<Angle> signal)
-    {
+    /**
+     * Registers a Phoenix signal to be read from the thread.
+     *
+     * @param signal Phoenix status signal to register
+     * @return Queue that will receive sampled values from the signal
+     */
+    public Queue<Double> registerSignal(StatusSignal<Angle> signal) {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         signalsLock.lock();
         Drive.odometryLock.lock();
@@ -92,9 +99,13 @@ public class PhoenixOdometryThread extends Thread {
         return queue;
     }
 
-    /** Registers a generic signal to be read from the thread. */
-    public Queue<Double> registerSignal(DoubleSupplier signal)
-    {
+    /**
+     * Registers a generic signal to be read from the thread.
+     *
+     * @param signal DoubleSupplier providing signal values
+     * @return Queue that will receive sampled values from the signal
+     */
+    public Queue<Double> registerSignal(DoubleSupplier signal) {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         signalsLock.lock();
         Drive.odometryLock.lock();
@@ -108,9 +119,12 @@ public class PhoenixOdometryThread extends Thread {
         return queue;
     }
 
-    /** Returns a new queue that returns timestamp values for each sample. */
-    public Queue<Double> makeTimestampQueue()
-    {
+    /**
+     * Returns a new queue that returns timestamp values for each sample.
+     *
+     * @return Queue that will receive timestamp values in seconds
+     */
+    public Queue<Double> makeTimestampQueue() {
         Queue<Double> queue = new ArrayBlockingQueue<>(20);
         Drive.odometryLock.lock();
         try {
@@ -123,8 +137,7 @@ public class PhoenixOdometryThread extends Thread {
 
     @Override
     @SuppressWarnings("CatchAndPrintStackTrace")
-    public void run()
-    {
+    public void run() {
         while (true) {
             // Wait for updates from all signals
             signalsLock.lock();
@@ -140,7 +153,10 @@ public class PhoenixOdometryThread extends Thread {
                         BaseStatusSignal.refreshAll(phoenixSignals);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                DriverStation.reportError(
+                    "Phoenix odometry thread interrupted: " + e.getMessage(),
+                    e.getStackTrace());
+                Thread.currentThread().interrupt(); // Restore interrupt status
             } finally {
                 signalsLock.unlock();
             }

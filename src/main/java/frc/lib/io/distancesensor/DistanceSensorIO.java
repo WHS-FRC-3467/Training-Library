@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Windham Windup
+ * Copyright (C) 2026 Windham Windup
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public License as published by the Free Software Foundation, either version 3 of the
@@ -32,21 +32,10 @@ public interface DistanceSensorIO {
     }
 
     /**
-     * Getter for the name of the sensor
-     * 
-     * @return The name of the sensor
-     */
-    public default String getName()
-    {
-        return "";
-    }
-
-    /**
      * Updates the provided {@link DistanceSensorInputs} instance with the latest sensor readings.
      * If the sensor is not connected, it populates the fields with default values.
      *
      * @param inputs The structure to populate with updated sensor values.
      */
-    public default void updateInputs(DistanceSensorInputs inputs)
-    {}
+    public default void updateInputs(DistanceSensorInputs inputs) {}
 }
