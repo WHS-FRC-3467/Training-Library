@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.posestimator.SwerveOdometry.OdometryObservation;
+import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.LoggerHelper;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
@@ -98,6 +99,8 @@ public class Drive extends SubsystemBase {
             AlertType.kError);
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
+    LoggedTunableNumber multiplier;
+    
 
     /**
      * Constructs a new Drive subsystem.
@@ -114,6 +117,7 @@ public class Drive extends SubsystemBase {
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
         ModuleIO brModuleIO) {
+            multiplier.initDefault(1.0);
         this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0, DriveConstants.FrontLeft);
         modules[1] = new Module(frModuleIO, 1, DriveConstants.FrontRight);
@@ -222,8 +226,9 @@ public class Drive extends SubsystemBase {
      * @param speeds Speeds in meters/sec
      */
     public void runVelocity(ChassisSpeeds speeds) {
+        ChassisSpeeds realSpeed = speeds.times(multiplier.getAsDouble());
         // Calculate module setpoints
-        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
+        ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(realSpeed, 0.02);
         SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, DriveConstants.kSpeedAt12Volts);
 
