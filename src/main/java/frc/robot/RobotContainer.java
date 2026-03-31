@@ -19,12 +19,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.lib.commands.SteppableCommandGroup;
-import frc.lib.util.LoggedDashboardChooser;
 import frc.lib.util.LoggedTuneableProfiledPID;
 import frc.lib.util.CommandXboxControllerExtended;
 import frc.robot.Constants.PathConstants;
@@ -51,7 +49,7 @@ public class RobotContainer {
 
     // Subsystems
     public final Drive drive;
- 
+
     // Controller
     private final CommandXboxControllerExtended controller = new CommandXboxControllerExtended(0);
 

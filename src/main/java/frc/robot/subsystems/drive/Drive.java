@@ -99,7 +99,7 @@ public class Drive extends SubsystemBase {
             AlertType.kError);
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
-    LoggedTunableNumber multiplier;
+    LoggedTunableNumber multiplier = new LoggedTunableNumber("Drive Multiplier");
 
 
     /**
