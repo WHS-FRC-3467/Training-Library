@@ -100,7 +100,7 @@ public class Drive extends SubsystemBase {
 
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     LoggedTunableNumber multiplier;
-    
+
 
     /**
      * Constructs a new Drive subsystem.
@@ -117,7 +117,7 @@ public class Drive extends SubsystemBase {
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
         ModuleIO brModuleIO) {
-            multiplier.initDefault(1.0);
+        multiplier.initDefault(1.0);
         this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0, DriveConstants.FrontLeft);
         modules[1] = new Module(frModuleIO, 1, DriveConstants.FrontRight);

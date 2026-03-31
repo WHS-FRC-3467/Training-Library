@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -44,11 +43,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
-    private final RobotState robotState = RobotState.getInstance();
 
 
     private Command autonomousCommand;
-    private RobotContainer robotContainer;
     private Field2d fieldMap = new Field2d();
 
     public Robot() {
@@ -112,7 +109,7 @@ public class Robot extends LoggedRobot {
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
-        robotContainer = new RobotContainer();
+         new RobotContainer();
 
         DriverStation.silenceJoystickConnectionWarning(!Robot.isReal());
     }
@@ -134,7 +131,6 @@ public class Robot extends LoggedRobot {
             Robot.isReal() ? Constants.RobotConstants.serial.subSequence(0, 8).toString()
                 : Constants.RobotConstants.serial);
 
-        SmartDashboard.putData("Robot Pose Field Map", fieldMap);
     }
 
     /**
@@ -170,14 +166,9 @@ public class Robot extends LoggedRobot {
         }
     }
 
-    /**
-     * This function is called periodically when disabled. Checks and displays the robot's starting
-     * pose for autonomous mode.
-     */
+   
     @Override
     public void disabledPeriodic() {
-        robotContainer.checkStartPose();
-        robotContainer.autoPreviewField.setRobotPose(robotState.getEstimatedPose());
     }
 
     /**
@@ -185,23 +176,11 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
-        // Switch to Autonomous tab in Elastic Dashboard
-        if (DriverStation.isFMSAttached()) {
-            Elastic.selectTab(1);
-        }
-
-        autonomousCommand = robotContainer.getAutonomousCommand();
-
-        // schedule the autonomous command (example)
-        if (autonomousCommand != null) {
-            CommandScheduler.getInstance().schedule(autonomousCommand);
-        }
     }
 
     /** This function is called periodically during autonomous. */
     @Override
     public void autonomousPeriodic() {
-        robotContainer.autoPreviewField.setRobotPose(robotState.getEstimatedPose());
     }
 
     /** This function is called once when teleop is enabled. */

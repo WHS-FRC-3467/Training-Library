@@ -51,69 +51,16 @@ public class RobotContainer {
 
     // Subsystems
     public final Drive drive;
-    // private final LEDs leds;
-    // private final LaserCAN1 laserCAN1;
-    // private final BeamBreak1 beamBreak1;
-    // private final Servo1 servo1;
-    // private final ObjectDetector objectDetector;
-    // private final Superstructure superstructure;
-    // private final TurretSuperstructure turret;
-
+ 
     // Controller
     private final CommandXboxControllerExtended controller = new CommandXboxControllerExtended(0);
-
-    // Dashboard inputs
-    // private final LoggedDashboardChooser<AutoCommand> autoChooser;
-    private final LoggedDashboardChooser<Boolean> conditionalChooser;
-    public static Field2d autoPreviewField = new Field2d();
-
-    // private final Trigger inAllianceRegionTrigger;
 
     /**
      * The container for the robot. Contains subsystems, IO devices, and commands.
      */
     public RobotContainer() {
         drive = DriveConstants.get();
-        // laserCAN1 = LaserCAN1Constants.get();
-        // leds = LEDsConstants.get();
-        // beamBreak1 = BeamBreak1Constants.get();
-        // superstructure = SuperstructureConstants.get();
-        // servo1 = Servo1Constants.get();
-        // objectDetector = ObjectDetectorConstants.get();
-        // turret = TurretSuperstructureConstants.get();
-        // VisionConstants.create();
-
-        conditionalChooser = new LoggedDashboardChooser<>("Conditional Choice");
-        conditionalChooser.addOption("True", true);
-        conditionalChooser.addOption("False", false);
-
-        // Set up auto routines
-        // autoChooser = new LoggedDashboardChooser<>("Auto Choices");
-        // SmartDashboard.putData("Auto Preview", autoPreviewField);
-
-        // autoChooser.addDefaultOption("None", new NoneAuto());
-        // autoChooser.addOption("ExampleAuto", new ExampleAuto(drive));
-        // autoChooser.addOption("BranchingAuto",
-        // new BranchingAuto(drive, () -> conditionalChooser.get()));
-
-        // autoChooser.onChange(auto -> {
-        // autoPreviewField.getObject("path").setPoses(auto.getAllPathPoses());
-        // });
-
-        // autoChooser.addOption("Drive Wheel Radius Characterization",
-        // new WheelCharacterizationAuto(drive));
-
-        // autoChooser.addOption("Wheel Slip Characterization", new WheelSlipAuto(drive));
-
-        // inAllianceRegionTrigger = new Trigger(() -> PointInPolygon.pointInPolygon(
-        // robotState.getEstimatedPose().getTranslation(),
-        // FieldConstants.ALLIANCE_STATION_POLYGON));
-
-        // Configure the button bindings
         configureButtonBindings();
-
-        // GamePieceVisualizer algae = new GamePieceVisualizer("Algae",
-        // new Pose3d(new Translation3d(3, 3, 1), new Rotation3d(0, 0, 0)));
     }
 
     /**
@@ -171,19 +118,6 @@ public class RobotContainer {
                 MetersPerSecond.of(0.0), false, PathConstants.PATHGENERATION_DRIVE_TOLERANCE,
                 PathConstants.PATHGENERATION_ROT_TOLERANCE));
 
-        // SmartDashboard.putData("Superstructure: Stow",
-        // superstructure.setGoal(Superstructure.Setpoint.STOW));
-        // SmartDashboard.putData("Superstructure: Raised",
-        // superstructure.setGoal(Superstructure.Setpoint.RAISED));
-
-        // LoggedTunableNumber ballVel = new LoggedTunableNumber("Ball Sim Velocity (fps)", 15);
-        // SmartDashboard.putData("Shoot Ball", Commands
-        // .runOnce(() -> BallSimulator.launch(FeetPerSecond.of(ballVel.getAsDouble()))));
-
-        // GamePieceVisualizer algaeViz =
-        // new GamePieceVisualizer("Algae #1", new Pose3d(1, 1, 1, new Rotation3d()));
-        // SmartDashboard.putData("Hide Algae", Commands.runOnce(() -> algaeViz.hide()));
-
         LoggedTuneableProfiledPID linearController =
             new LoggedTuneableProfiledPID("DriveToPose/LinearController", 3.0, 0, 0.1, 0, 3.0);
 
@@ -199,25 +133,6 @@ public class RobotContainer {
             Commands.runOnce(() -> System.out.println("Step 3")));
 
         SmartDashboard.putData("Steppable Command", steppableCommand);
-
-        // controller.x()
-        // .whileTrue(new DriveToPose(drive, () -> new Pose2d(5, 5, Rotation2d.fromDegrees(90)))
-        // .withTolerance(Inches.of(3), Degrees.of(5)));
-
-        // controller.x()
-        // .whileTrue(new AlignToPose(drive, () -> new Pose2d(5, 5, Rotation2d.fromDegrees(0)),
-        // AlignMode.STRAFE, () -> controller.getRightX()));
-
-        // Right bumper: Shoot on the Move
-        // controller.rightBumper().whileTrue(
-        // turret.shoot(drive, () -> -controller.getLeftX(), () -> -controller.getLeftY()));
-
-        // inAllianceRegionTrigger.onTrue(
-        // Commands.runOnce(() -> Logger.recordOutput("InAllianceRegionTrigger", true))
-        // .ignoringDisable(true));
-        // inAllianceRegionTrigger.onFalse(
-        // Commands.runOnce(() -> Logger.recordOutput("InAllianceRegionTrigger", false))
-        // .ignoringDisable(true));
     }
 
     /**
@@ -230,45 +145,4 @@ public class RobotContainer {
         // autoChooser.get();
     }
 
-    /** This function is called periodically by Robot.java when disabled. */
-    public void checkStartPose() {
-
-        /* Starting pose checker for auto */
-        autoPreviewField.setRobotPose(robotState.getEstimatedPose());
-
-        try {
-            double distanceFromStartPose = robotState.getEstimatedPose().getTranslation()
-                .getDistance(autoPreviewField.getObject("path").getPoses().get(0).getTranslation());
-            double degreesFromStartPose = Math.abs(robotState.getEstimatedPose().getRotation()
-                .minus(
-                    autoPreviewField.getObject("path").getPoses().get(0).getRotation())
-                .getDegrees());
-
-            SmartDashboard.putNumber("Auto Pose Check/Inches from Start",
-                Math.round(distanceFromStartPose * 100.0) / 100.0);
-            SmartDashboard.putBoolean(
-                "Auto Pose Check/Robot Position within "
-                    + PathConstants.STARTING_POSE_DRIVE_TOLERANCE.in(Inches) + " inches",
-                distanceFromStartPose < PathConstants.STARTING_POSE_DRIVE_TOLERANCE.in(Inches));
-            SmartDashboard.putNumber("Auto Pose Check/Degrees from Start",
-                Math.round(degreesFromStartPose * 100.0) / 100.0);
-            SmartDashboard.putBoolean(
-                "Auto Pose Check/Robot Rotation within "
-                    + PathConstants.STARTING_POSE_ROT_TOLERANCE_DEGREES + " degrees",
-                degreesFromStartPose < PathConstants.STARTING_POSE_ROT_TOLERANCE_DEGREES
-                    .in(Degrees));
-
-        } catch (Exception e) {
-            SmartDashboard.putNumber("Auto Pose Check/Inches from Start", -1);
-            SmartDashboard.putBoolean(
-                "Auto Pose Check/Robot Position within "
-                    + PathConstants.STARTING_POSE_DRIVE_TOLERANCE.in(Inches) + " inches",
-                false);
-            SmartDashboard.putNumber("Auto Pose Check/Degrees from Start", -1);
-            SmartDashboard.putBoolean(
-                "Auto Pose Check/Robot Rotation within "
-                    + PathConstants.STARTING_POSE_ROT_TOLERANCE_DEGREES.in(Degrees) + " degrees",
-                false);
-        }
-    }
 }
