@@ -61,6 +61,7 @@ public class CANUpdateThread implements AutoCloseable {
         }, executor);
     }
 
+
     /**
      * Attempts a LaserCAN configuration action up to MAX_RETRIES times.
      *

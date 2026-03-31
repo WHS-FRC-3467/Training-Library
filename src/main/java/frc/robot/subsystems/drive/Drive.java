@@ -46,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.lib.posestimator.SwerveOdometry.OdometryObservation;
 import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.LoggerHelper;
+import frc.lib.util.PID;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.util.LocalADStarAK;
@@ -276,6 +277,15 @@ public class Drive extends SubsystemBase {
         }
         kinematics.resetHeadings(headings);
         stop();
+    }
+
+    public Command setDrivePID(PID pid) {
+        return this.runOnce(() -> {
+            for (var module : modules) {
+                module.setDrivePID(pid);
+            }
+        });
+
     }
 
     /**

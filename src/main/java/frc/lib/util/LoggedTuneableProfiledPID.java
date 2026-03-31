@@ -78,6 +78,10 @@ public class LoggedTuneableProfiledPID extends ProfiledPIDController {
         this.maxAcceleration = new LoggedTunableNumber(name + "/maxAcceleration", maxAcceleration);
     }
 
+    public PID convert() {
+        return new PID(getP(), getI(), getD());
+    }
+
     /**
      * Updates PID and motion profile constraints from tunable values if changed.
      */
