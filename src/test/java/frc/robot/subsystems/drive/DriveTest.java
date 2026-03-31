@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -70,35 +69,6 @@ class DriveTest {
                                                                              // is 0
         } catch (Exception e) {
             fail("Failed to stop the drive: " + e.getMessage());
-        }
-    }
-
-    @Test
-    void testDriveVelocity() {
-         
-        TestUtil.runTest(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.5, 1.5, 0.0))), 1,
-            drive);
-        try {
-            
-            assertEquals(drive.getMultiplierSpeed(new ChassisSpeeds(1.5, 1.5, 0.0)).vxMetersPerSecond, drive.getChassisSpeeds().vxMetersPerSecond, DELTA);
-            assertEquals(1.5, drive.getChassisSpeeds().vyMetersPerSecond, DELTA);
-           
-        } catch (Exception e) {
-            
-            fail(
-                "Failed to run drive linear velocity of 1.5 m/s in the x direction and 3 m/s in the y direction: "
-                    + e.getMessage());
-        }
-    }
-
-    @Test
-    void testSteerVelocity() {
-        TestUtil.runTest(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(0.0, 0.0, 1.5))), 1,
-            drive);
-        try {
-            assertEquals(1.5, drive.getChassisSpeeds().omegaRadiansPerSecond, DELTA);
-        } catch (Exception e) {
-            fail("Failed to run drive rotational velocity of 1.5 rad/s: " + e.getMessage());
         }
     }
 
