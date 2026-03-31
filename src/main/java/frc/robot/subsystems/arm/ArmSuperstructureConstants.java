@@ -38,8 +38,15 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Velocity;
+import frc.lib.io.motor.MotorIO;
+import frc.lib.io.motor.MotorIOSim;
+import frc.lib.io.motor.MotorIO.PIDSlot;
 import frc.lib.io.motor.MotorIOTalonFX;
+import frc.lib.io.motor.MotorIOTalonFX.TalonFXFollower;
 import frc.lib.io.motor.MotorIOTalonFXSim;
+import frc.lib.mechanisms.flywheel.FlywheelMechanism;
+import frc.lib.mechanisms.flywheel.FlywheelMechanismReal;
+import frc.lib.mechanisms.flywheel.FlywheelMechanismSim;
 import frc.lib.mechanisms.rotary.RotaryMechanism;
 import frc.lib.mechanisms.rotary.RotaryMechanism.RotaryAxis;
 import frc.lib.mechanisms.rotary.RotaryMechanism.RotaryMechCharacteristics;
@@ -87,8 +94,7 @@ public class ArmSuperstructureConstants {
         .withKS(0.07)
         .withKV(0.1);
 
-    public static TalonFXConfiguration getFXConfig()
-    {
+    public static TalonFXConfiguration getFXConfig() {
         TalonFXConfiguration config = new TalonFXConfiguration();
 
         config.CurrentLimits.SupplyCurrentLimitEnable = false;
@@ -124,42 +130,36 @@ public class ArmSuperstructureConstants {
         return config;
     }
 
-    public static ArmSuperstructure get()
-    {
+    public static ArmSuperstructure get() {
+       ArmSuperstructure<?> mechanism;
         switch (Constants.currentMode) {
             case REAL:
-                return new ArmSuperstructure(new RotaryMechanismReal("leader " + NAME,
-                    new MotorIOTalonFX("leader " + NAME, getFXConfig(), Ports.arm),
-                    CONSTANTS,
-                    Optional.empty(), "leader " + NAME),
-                    
-                    new RotaryMechanismReal(
-                        "follower " + NAME,
-                    new MotorIOTalonFX("follower " + NAME, getFXConfig(), Ports.arm),
-                    CONSTANTS,
-                    Optional.empty(), "follower " + NAME));
+                mechanism =
+                         new ArmSuperstructure( new RotaryMechanismReal(
+                                "Left " + NAME,
+                                new MotorIOTalonFX(
+                                        "Left " + NAME,
+                                        getFXConfig(),
+                                        Ports.arm,
+                                        new TalonFXFollower(Ports.armf, false)), null, java.util.Optional.empty(), null));
+                break;
             case SIM:
-                return new ArmSuperstructure(new RotaryMechanismSim("leader " + NAME,
-                    new MotorIOTalonFXSim("leader " + NAME, getFXConfig(), Ports.arm),
-                    DCMOTOR, MOI, false, CONSTANTS,
-                    Optional.empty(), "leader " + NAME
-                
-                ),
-                    new RotaryMechanismSim("follower " + NAME,
-                    new MotorIOTalonFXSim("follower " + NAME, getFXConfig(), Ports.arm),
-                    DCMOTOR, MOI, false, CONSTANTS,
-                    Optional.empty(),
-                "follower " + NAME
-                )
-                
-                );
+                mechanism =
+                        new ArmSuperstructure( new RotaryMechanismSim(
+                                "Left " + NAME,
+                                new MotorIOSim(
+                                        "Left " + NAME,
+                                        getFXConfig(),
+                                        Ports.arm,
+                                        new TalonFXFollower(Ports.armf, false)), null, java.util.Optional.empty(), null));
+                break;
             case REPLAY:
-                return new ArmSuperstructure(new RotaryMechanism("leader " +NAME, CONSTANTS, null, java.util.Optional.empty(), null) {}, 
-                new RotaryMechanism("leader " + NAME, CONSTANTS, null, java.util.Optional.empty(), null) {}
-            
-            );
+                mechanism = new FlywheelMechanism<>("Left " + NAME, new MotorIO() {}) {};
+                break;
             default:
                 throw new IllegalStateException("Unrecognized Robot Mode");
         }
+        mechanism.enableTunablePID(PIDSlot.SLOT_0, SLOT0_PID);
+        return mechanism;
     }
 }

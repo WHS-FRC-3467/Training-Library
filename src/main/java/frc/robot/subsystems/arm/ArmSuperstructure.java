@@ -15,7 +15,6 @@
 package frc.robot.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -26,8 +25,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 public class ArmSuperstructure extends SubsystemBase {
+
     private final RotaryMechanism<?, ?> leader;
-    private final RotaryMechanism<?, ?> follower;
+
 
     @Getter
     @RequiredArgsConstructor
@@ -43,17 +43,19 @@ public class ArmSuperstructure extends SubsystemBase {
         TRAP(Degrees.of(-3.0)),
         FEED(Degrees.of(10.0)),
         HARMONY(Degrees.of(122.0));
-       private final Angle angle;
-       
 
-        
+        private final Angle angle;
+
+
+
     }
-    
+
+
     private State armState = State.STOWED;
 
-    ArmSuperstructure(RotaryMechanism<?, ?> leader, RotaryMechanism<?, ?> follower) {
+    ArmSuperstructure(RotaryMechanism<?, ?> leader) {
         this.leader = leader;
-        this.follower = follower;
+   
     }
 
     public Command runPosition(RotaryMechanism<?, ?> mechanism, State armState) {
@@ -61,13 +63,10 @@ public class ArmSuperstructure extends SubsystemBase {
     }
 
     public Command setArmState(State armState) {
-        return this.runOnce(
-            
-         () -> Commands.sequence(
-            runPosition(leader, armState),
-            runPosition(follower, armState)
-          )
-           
-        );
+        return this.runOnce( () -> 
+runPosition(leader, armState));
+                
+
+        
     }
 }

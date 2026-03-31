@@ -37,7 +37,8 @@ public class Ports {
 
     public static final Device.CAN pdh = new CAN(2, "rio");
     public static final Device.CAN intake = new CAN(3, "rio");
-     public static final Device.CAN arm = new CAN(4, "rio");
+    public static final Device.CAN arm = new CAN(4, "rio");
+        public static final Device.CAN armf = new CAN(5, "rio");
 
 
 }

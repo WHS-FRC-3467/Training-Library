@@ -27,6 +27,8 @@ import frc.lib.util.FieldUtil;
 import frc.robot.Constants.PathConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.autos.*;
+import frc.robot.subsystems.arm.ArmSuperstructure;
+import frc.robot.subsystems.arm.ArmSuperstructureConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.intake.Intake;
@@ -57,6 +59,7 @@ public class RobotContainer {
     public final Drive drive;
     private final LEDs leds;
     private final Intake intake;
+    private final ArmSuperstructure arm;
 
     // Controller
     private final CommandXboxControllerExtended controller =
@@ -71,14 +74,20 @@ public class RobotContainer {
     /**
      * The container for the robot. Contains subsystems, IO devices, and commands.
      */
+    @SuppressWarnings("unchecked")
     public RobotContainer() {
 
         VisionConstants.create();
         drive = DriveConstants.get();
         leds = LEDsConstants.get();
         intake = IntakeConstants.get();
+        arm = ArmSuperstructureConstants.get();
 
 
+        LoggedDashboardChooser<Command> ldc = new LoggedDashboardChooser<>("ArmState");
+        for (ArmSuperstructure.State s : ArmSuperstructure.State.values()) {
+            ldc.addOption(s.toString(), arm.setArmState(s));
+        }
         autoChooser = new LoggedDashboardChooser<>("Auto Choices");
         SmartDashboard.putData("Auto Preview", autoPreviewField);
 
@@ -101,7 +110,6 @@ public class RobotContainer {
         SmartDashboard.putData("Intake Push", intake.push());
         SmartDashboard.putData("Intake Pull", intake.pull());
 
-        
 
 
         // Configure the button bindings
