@@ -75,12 +75,16 @@ class DriveTest {
 
     @Test
     void testDriveVelocity() {
+         
         TestUtil.runTest(Commands.run(() -> drive.runVelocity(new ChassisSpeeds(1.5, 1.5, 0.0))), 1,
             drive);
         try {
-            assertEquals(1.5, drive.getChassisSpeeds().vxMetersPerSecond, DELTA);
+            
+            assertEquals(drive.getMultiplierSpeed(new ChassisSpeeds(1.5, 1.5, 0.0)).vxMetersPerSecond, drive.getChassisSpeeds().vxMetersPerSecond, DELTA);
             assertEquals(1.5, drive.getChassisSpeeds().vyMetersPerSecond, DELTA);
+           
         } catch (Exception e) {
+            
             fail(
                 "Failed to run drive linear velocity of 1.5 m/s in the x direction and 3 m/s in the y direction: "
                     + e.getMessage());

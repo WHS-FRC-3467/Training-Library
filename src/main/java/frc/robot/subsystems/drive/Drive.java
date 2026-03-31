@@ -220,6 +220,9 @@ public class Drive extends SubsystemBase {
             getChassisSpeeds().vyMetersPerSecond).getNorm() * -1);
     }
 
+    public ChassisSpeeds getMultiplierSpeed(ChassisSpeeds speeds) {
+        return speeds.times(multiplier.getAsDouble());
+    }
     /**
      * Runs the drive at the desired velocity.
      *
