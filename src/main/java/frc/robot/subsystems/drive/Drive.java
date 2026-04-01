@@ -39,6 +39,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -102,6 +103,9 @@ public class Drive extends SubsystemBase {
     private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
     LoggedTunableNumber multiplier = new LoggedTunableNumber("Drive Multiplier");
 
+    private boolean flipped = false;
+    private double modifier = 0.0;
+    
 
     /**
      * Constructs a new Drive subsystem.
@@ -118,6 +122,7 @@ public class Drive extends SubsystemBase {
         ModuleIO frModuleIO,
         ModuleIO blModuleIO,
         ModuleIO brModuleIO) {
+    
         multiplier.initDefault(1.0);
         this.gyroIO = gyroIO;
         modules[0] = new Module(flModuleIO, 0, DriveConstants.FrontLeft);
@@ -184,6 +189,22 @@ public class Drive extends SubsystemBase {
             for (var module : modules) {
                 module.stop();
             }
+        }
+        long now = RobotController.getTime();
+        final double periodMicros =
+            Seconds.of(10).in(Microseconds);
+
+        double t = (now % (long) periodMicros) / periodMicros;
+        int active = (int) (2 * t);
+        if (active == 1 && !flipped) {
+            flipped = true;
+            if (multiplier.getAsDouble() + 0.05 <= 1.0) {
+                modifier += 0.05;
+            }
+
+            
+        } else if (flipped && active == 0) {
+            flipped = false;
         }
 
         // Log empty setpoint states when disabled

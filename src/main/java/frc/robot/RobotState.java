@@ -42,9 +42,6 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RobotState {
 
-    private static final LoggedTunableNumber SHOOT_TOLERANCE_DEGREES =
-        new LoggedTunableNumber("RobotState/ShootToleranceDegrees", 1.0);
-
     private static final double LINEAR_ODOMETRY_STD_DEV = 0.01;
     private static final double ANGULAR_ODOMETRY_STD_DEV = 0.01;
 
@@ -55,12 +52,6 @@ public class RobotState {
     @Getter
     @AutoLogOutput(key = "Drive/DrivetrainAngled")
     private boolean drivetrainAngled = false;
-
-    public final Trigger facingTarget = new Trigger(() -> Math.abs(getAngleToTarget()
-        .minus(getEstimatedPose().getRotation())
-        .getDegrees()) < SHOOT_TOLERANCE_DEGREES.get());
-
-    // -------- POSE ESTIMATION --------
 
     private final PoseEstimator poseEstimator = new PoseEstimator(
         new SwerveDriveKinematics(Drive.getModuleTranslations()),
