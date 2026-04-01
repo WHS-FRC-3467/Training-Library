@@ -119,6 +119,10 @@ public class RobotContainer {
         LoggedTuneableProfiledPID linearController =
             new LoggedTuneableProfiledPID("DriveToPose/LinearController", 3.0, 0, 0.1, 0, 3.0);
 
+        // nice values
+        // kp = 70
+        // ki = 0
+        // kd = 0
         LoggedTuneableProfiledPID drivePID =
             new LoggedTuneableProfiledPID("DrivePID", 60.0, 0, 0, 5.0, 0);
         SmartDashboard.putData("SubmitDrivePID", drive.setDrivePID(drivePID.convert()));
